@@ -29,7 +29,9 @@ class _PixabayPageState extends State<PixabayPage> {
   Future<void> fetchImages() async {
     //awaitで待つことで、Respoce型のデータを受け取っている
     Response response = await Dio().get(
-        'https://pixabay.com/api/?key=43900472-a82cdd993bf6549e351194a4b&q=yellow+flowers&image_type=photo');
+        //?以降のURLはクエリパラメーターと呼ばれ、[パラメーター=値]という形で表される
+        //また、各パラメーターは&で区切って表示される
+        'https://pixabay.com/api/?key=43900472-a82cdd993bf6549e351194a4b&q=いちご&image_type=photo&per_page=100');
     print(response.data);
 
     //定義したリストに取得したデータを代入し、setState関数で画面を更新する
@@ -47,6 +49,11 @@ class _PixabayPageState extends State<PixabayPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: TextField(
+          decoration: InputDecoration(fillColor: Colors.white, filled: true),
+        ),
+      ),
       body: GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             //画像を横に並べる際の個数を3個に指定
