@@ -26,12 +26,13 @@ class PixabayPage extends StatefulWidget {
 class _PixabayPageState extends State<PixabayPage> {
   List imageList = [];
   //非同期の関数のため、返り値の方にFutureがつき、asyncキーワードが追加された
-  Future<void> fetchImages() async {
+  Future<void> fetchImages(String text) async {
     //awaitで待つことで、Respoce型のデータを受け取っている
     Response response = await Dio().get(
         //?以降のURLはクエリパラメーターと呼ばれ、[パラメーター=値]という形で表される
         //また、各パラメーターは&で区切って表示される
-        'https://pixabay.com/api/?key=43900472-a82cdd993bf6549e351194a4b&q=いちご&image_type=photo&per_page=100');
+        //qの値にtext変数の値が入るように変更
+        'https://pixabay.com/api/?key=43900472-a82cdd993bf6549e351194a4b&q=$text&image_type=photo&per_page=100');
     print(response.data);
 
     //定義したリストに取得したデータを代入し、setState関数で画面を更新する
@@ -43,17 +44,21 @@ class _PixabayPageState extends State<PixabayPage> {
   @override
   void initState() {
     super.initState();
-    fetchImages();
+    //fetchImages関数に引数を追加したため、初期の値を入力
+    fetchImages('花');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        //文字列入力用にTextFieldウィジェットを追加
         title: TextField(
           decoration: InputDecoration(fillColor: Colors.white, filled: true),
+          //TextFieldの確定ボタンが押下された際の処理
           onSubmitted: (text) {
             print(text);
+            fetchImages(text);
           },
         ),
       ),
