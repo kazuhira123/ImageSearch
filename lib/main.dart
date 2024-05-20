@@ -52,6 +52,9 @@ class _PixabayPageState extends State<PixabayPage> {
       appBar: AppBar(
         title: TextField(
           decoration: InputDecoration(fillColor: Colors.white, filled: true),
+          onSubmitted: (text) {
+            print(text);
+          },
         ),
       ),
       body: GridView.builder(
