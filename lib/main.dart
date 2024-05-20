@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 void main() {
   runApp(const MyApp());
@@ -74,12 +75,33 @@ class _PixabayPageState extends State<PixabayPage> {
           Map<String, dynamic> image = imageList[index];
           //プレビュー用の画像データがあるURLはpreviewURLのvalueに入っている
           return Stack(
+            fit: StackFit.expand,
             children: [
-              Image.network(image['previewURL']),
+              Image.network(
+                image['previewURL'],
+                //fitパラメーターで画像ごとの領域いっぱいに画像を表示するようにした
+                fit: BoxFit.cover,
+              ),
               //API内のlikes keyの値がいいね数に該当するため、image@['likes']で取得
               //さらに、toString()で文字列型に変換
-              Container(
-                  color: Colors.white, child: Text(image['likes'].toString())),
+              Align(
+                //いいね数を右下に表示するためにalignmentプロパティを追加
+                alignment: Alignment.bottomRight,
+                child: Container(
+                    color: Colors.white,
+                    child: Row(
+                      //いいね数を必要最小限のサイズに
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        //いいねアイコン用にサムズアップアイコンを追加
+                        const Icon(
+                          Icons.thumb_up_alt_outlined,
+                          size: 14,
+                        ),
+                        Text(image['likes'].toString()),
+                      ],
+                    )),
+              ),
             ],
           );
         },
