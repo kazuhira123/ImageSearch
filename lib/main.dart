@@ -73,7 +73,15 @@ class _PixabayPageState extends State<PixabayPage> {
           //image変数にindex番号に紐づいたListの各要素が順番に代入される
           Map<String, dynamic> image = imageList[index];
           //プレビュー用の画像データがあるURLはpreviewURLのvalueに入っている
-          return Image.network(image['previewURL']);
+          return Stack(
+            children: [
+              Image.network(image['previewURL']),
+              //API内のlikes keyの値がいいね数に該当するため、image@['likes']で取得
+              //さらに、toString()で文字列型に変換
+              Container(
+                  color: Colors.white, child: Text(image['likes'].toString())),
+            ],
+          );
         },
       ),
     );
