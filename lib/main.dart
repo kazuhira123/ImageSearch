@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 void main() {
   runApp(const MyApp());
@@ -97,6 +98,8 @@ class _PixabayPageState extends State<PixabayPage> {
               //一時保存用のフォルダにimage.pngファイルを作成し、それを変数imageFileの中に代入
               File imageFile = await File('${dir.path}/image.png')
                   .writeAsBytes(response.data);
+
+              await Share.shareXFiles([XFile(imageFile.path)]);
               print(image['likes']);
             },
             child: Stack(
