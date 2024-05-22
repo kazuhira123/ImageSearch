@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -75,7 +78,25 @@ class _PixabayPageState extends State<PixabayPage> {
           Map<String, dynamic> image = imageList[index];
           //プレビュー用の画像データがあるURLはpreviewURLのvalueに入っている
           return InkWell(
-            onTap: () {
+            onTap: () async {
+              //一時保存用のフォルダ情報を変数dirに代入する
+              //この際、Future型に
+              Directory dir = await getTemporaryDirectory();
+
+              //Dio().get()でhttp通信におけるGETメソッドを使用し、Response型のresponse変数に結果を代入
+              Response response = await Dio().get(
+                //高画質の画像をダウンロードするため、webfromatURLを使用
+                image['webformatURL'],
+                //optionsプロパティでデータ型を指定
+                options: Options(
+                  //画像をダウンロードする際は、ResponseType.bytesを指定する
+                  responseType: ResponseType.bytes,
+                ),
+              );
+
+              //一時保存用のフォルダにimage.pngファイルを作成し、それを変数imageFileの中に代入
+              File imageFile = await File('${dir.path}/image.png')
+                  .writeAsBytes(response.data);
               print(image['likes']);
             },
             child: Stack(
