@@ -36,10 +36,18 @@ class _PixabayPageState extends State<PixabayPage> {
     //final修飾子にすることで、変数の値が更新されなくなる
     //また、データ型の名前を記載しなくてよくなる
     final response = await Dio().get(
-        //?以降のURLはクエリパラメーターと呼ばれ、[パラメーター=値]という形で表される
-        //また、各パラメーターは&で区切って表示される
-        //qの値にtext変数の値が入るように変更
-        'https://pixabay.com/api/?key=43900472-a82cdd993bf6549e351194a4b&q=$text&image_type=photo&per_page=100');
+      //?以降のURLはクエリパラメーターと呼ばれ、[パラメーター=値]という形で表される
+      //また、各パラメーターは&で区切って表示される
+      //qの値にtext変数の値が入るように変更
+      'https://pixabay.com/api/',
+      //queryParametersによって、URLにおける?以降の部分をMap形式で与える
+      queryParameters: {
+        'key': '43900472-a82cdd993bf6549e351194a4b',
+        'q': text,
+        'image_type': 'photo',
+        'per_page': 100,
+      },
+    );
     print(response.data);
 
     //定義したリストに取得したデータを代入し、setState関数で画面を更新する
@@ -98,7 +106,7 @@ class _PixabayPageState extends State<PixabayPage> {
               );
 
               //一時保存用のフォルダにimage.pngファイルを作成し、それを変数imageFileの中に代入
-              fFile imageFile = await File('${dir.path}/image.png')
+              final imageFile = await File('${dir.path}/image.png')
                   .writeAsBytes(response.data);
 
               await Share.shareXFiles([XFile(imageFile.path)]);
