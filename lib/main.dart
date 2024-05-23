@@ -33,7 +33,9 @@ class _PixabayPageState extends State<PixabayPage> {
   //非同期の関数のため、返り値の方にFutureがつき、asyncキーワードが追加された
   Future<void> fetchImages(String text) async {
     //awaitで待つことで、Respoce型のデータを受け取っている
-    Response response = await Dio().get(
+    //final修飾子にすることで、変数の値が更新されなくなる
+    //また、データ型の名前を記載しなくてよくなる
+    final response = await Dio().get(
         //?以降のURLはクエリパラメーターと呼ばれ、[パラメーター=値]という形で表される
         //また、各パラメーターは&で区切って表示される
         //qの値にtext変数の値が入るように変更
@@ -82,10 +84,10 @@ class _PixabayPageState extends State<PixabayPage> {
             onTap: () async {
               //一時保存用のフォルダ情報を変数dirに代入する
               //この際、Future型に
-              Directory dir = await getTemporaryDirectory();
+              final dir = await getTemporaryDirectory();
 
               //Dio().get()でhttp通信におけるGETメソッドを使用し、Response型のresponse変数に結果を代入
-              Response response = await Dio().get(
+              final response = await Dio().get(
                 //高画質の画像をダウンロードするため、webfromatURLを使用
                 image['webformatURL'],
                 //optionsプロパティでデータ型を指定
@@ -96,7 +98,7 @@ class _PixabayPageState extends State<PixabayPage> {
               );
 
               //一時保存用のフォルダにimage.pngファイルを作成し、それを変数imageFileの中に代入
-              File imageFile = await File('${dir.path}/image.png')
+              fFile imageFile = await File('${dir.path}/image.png')
                   .writeAsBytes(response.data);
 
               await Share.shareXFiles([XFile(imageFile.path)]);
