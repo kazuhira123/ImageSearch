@@ -55,6 +55,29 @@ class _PixabayPageState extends State<PixabayPage> {
     setState(() {});
   }
 
+  Future<void> shareImage(String url) async {
+    //一時保存用のフォルダ情報を変数dirに代入する
+    //この際、Future型になるため、aysnc awaitを使用する
+    final dir = await getTemporaryDirectory();
+
+    //Dio().get()でhttp通信におけるGETメソッドを使用し、Response型のresponse変数に結果を代入
+    final response = await Dio().get(
+      //引数のurlをgetメソッドに代入
+      url,
+      //optionsプロパティでデータ型を指定
+      options: Options(
+        //画像をダウンロードする際は、ResponseType.bytesを指定する
+        responseType: ResponseType.bytes,
+      ),
+    );
+
+    //一時保存用のフォルダにimage.pngファイルを作成し、それを変数imageFileの中に代入
+    final imageFile =
+        await File('${dir.path}/image.png').writeAsBytes(response.data);
+
+    await Share.shareXFiles([XFile(imageFile.path)]);
+  }
+
   //初回に一度だけ実行されるinitState関数を作成
   @override
   void initState() {
@@ -90,26 +113,8 @@ class _PixabayPageState extends State<PixabayPage> {
           //プレビュー用の画像データがあるURLはpreviewURLのvalueに入っている
           return InkWell(
             onTap: () async {
-              //一時保存用のフォルダ情報を変数dirに代入する
-              //この際、Future型に
-              final dir = await getTemporaryDirectory();
-
-              //Dio().get()でhttp通信におけるGETメソッドを使用し、Response型のresponse変数に結果を代入
-              final response = await Dio().get(
-                //高画質の画像をダウンロードするため、webfromatURLを使用
-                image['webformatURL'],
-                //optionsプロパティでデータ型を指定
-                options: Options(
-                  //画像をダウンロードする際は、ResponseType.bytesを指定する
-                  responseType: ResponseType.bytes,
-                ),
-              );
-
-              //一時保存用のフォルダにimage.pngファイルを作成し、それを変数imageFileの中に代入
-              final imageFile = await File('${dir.path}/image.png')
-                  .writeAsBytes(response.data);
-
-              await Share.shareXFiles([XFile(imageFile.path)]);
+              //高画質の画像をダウンロードするため、webfromatURLを使用
+              shareImage(image['webformatURL']);
               print(image['likes']);
             },
             child: Stack(
