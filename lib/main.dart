@@ -28,8 +28,9 @@ class PixabayPage extends StatefulWidget {
   State<PixabayPage> createState() => _PixabayPageState();
 }
 
+
 class _PixabayPageState extends State<PixabayPage> {
-  List imageList = [];
+  List<PixabayImage> pixabayImages = [];
   //非同期の関数のため、返り値の方にFutureがつき、asyncキーワードが追加された
   Future<void> fetchImages(String text) async {
     //awaitで待つことで、Respoce型のデータを受け取っている
@@ -50,8 +51,14 @@ class _PixabayPageState extends State<PixabayPage> {
     );
     print(response.data);
 
-    //定義したリストに取得したデータを代入し、setState関数で画面を更新する
-    imageList = response.data['hits'];
+    //取得したresponseのデータを変数hitsに代入
+    //この時、要素のデータ型はMap<String, dynamic>
+    final List hits = response.data['hits'];
+    //変数pixabayImagesに変数hitsの要素を新しいリストとして作成する
+    //map関数によってPixabayImagesを利用し、各要素を作成している
+    //その際、toList関数によって結果をリストとして取得している
+    pixabayImages = hits.map((e) => PixabayImage.fromMap(e)).toList();
+
     setState(() {});
   }
 
@@ -105,23 +112,24 @@ class _PixabayPageState extends State<PixabayPage> {
             //画像を横に並べる際の個数を3個に指定
             crossAxisCount: 3),
         //Listの要素数をitemCountプロパティlengthで取得する(今回は20)
-        itemCount: imageList.length,
+        itemCount: pixabayImages.length,
         //indexにはListの要素が0から順番に入る
         itemBuilder: (context, index) {
-          //image変数にindex番号に紐づいたListの各要素が順番に代入される
-          Map<String, dynamic> image = imageList[index];
+          //pixabayImage変数にindex番号に紐づいたListの各要素が順番に代入される
+          final pixabayImage = pixabayImages[index];
           //プレビュー用の画像データがあるURLはpreviewURLのvalueに入っている
           return InkWell(
             onTap: () async {
               //高画質の画像をダウンロードするため、webfromatURLを使用
-              shareImage(image['webformatURL']);
-              print(image['likes']);
+              //keyを指定して要素を取り出すのではなく、インスタンスの引数として取り出している
+              shareImage(pixabayImage.webformatURL);
+              print(pixabayImage.likes);
             },
             child: Stack(
               fit: StackFit.expand,
               children: [
                 Image.network(
-                  image['previewURL'],
+                  pixabayImage.previewURL,
                   //fitパラメーターで画像ごとの領域いっぱいに画像を表示するようにした
                   fit: BoxFit.cover,
                 ),
@@ -141,7 +149,7 @@ class _PixabayPageState extends State<PixabayPage> {
                             Icons.thumb_up_alt_outlined,
                             size: 14,
                           ),
-                          Text(image['likes'].toString()),
+                          Text('${pixabayImage.likes}'),
                         ],
                       )),
                 ),
@@ -150,6 +158,29 @@ class _PixabayPageState extends State<PixabayPage> {
           );
         },
       ),
+    );
+  }
+}
+//取得したデータをまとめる変数imageListの機能をクラスとしてまとめる
+class PixabayImage {
+  final String previewURL;
+  final int likes;
+  final String webformatURL;
+
+  PixabayImage(
+      {
+      //引数を名前付きで渡せるようにrequiredキーワードをつける
+      //これにより、関数を呼び出す際に下記の引数を省略せずに必ず指定しなければいけなくなった為、APIのkeyの打ち間違えなどが防げるようになった
+      //また、thisによって現在のインスタンスの引数を簡単に指定している
+      required this.previewURL,
+      required this.likes,
+      required this.webformatURL});
+  //
+  factory PixabayImage.fromMap(Map<String, dynamic> map) {
+    return PixabayImage(
+      previewURL: map['previewURL'],
+      likes: map['likes'],
+      webformatURL: map['webformatURL'],
     );
   }
 }
